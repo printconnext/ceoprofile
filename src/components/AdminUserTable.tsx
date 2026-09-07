@@ -11,6 +11,7 @@ interface UserData {
     createdAt: string;
     orgCount: number;
     profileCount: number;
+    profiles?: { id: string; slug: string; fullName: string | null; orgSlug: string }[];
 }
 
 interface Stats {
@@ -208,14 +209,33 @@ export default function AdminUserTable({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-sm">
-                                                <span className="text-gray-600" title="Organizations">
-                                                    🏢 {user.orgCount}
-                                                </span>
-                                                <span className="text-gray-300">|</span>
-                                                <span className="text-gray-600" title="Profiles">
-                                                    📄 {user.profileCount}
-                                                </span>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-600" title="Organizations">
+                                                        🏢 {user.orgCount}
+                                                    </span>
+                                                    <span className="text-gray-300">|</span>
+                                                    <span className="text-gray-600" title="Profiles">
+                                                        📄 {user.profileCount}
+                                                    </span>
+                                                </div>
+                                                {user.profiles && user.profiles.length > 0 && (
+                                                    <div className="mt-2 space-y-1 border-t border-gray-100 pt-2">
+                                                        {user.profiles.map(p => (
+                                                            <a 
+                                                                key={p.id}
+                                                                href={`/${p.orgSlug}/${p.slug}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-xs text-brand-blue hover:underline flex items-center gap-1"
+                                                                title={p.fullName || p.slug}
+                                                            >
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                                <span className="truncate max-w-[150px]">{p.fullName || p.slug}</span>
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -253,9 +273,30 @@ export default function AdminUserTable({
                                         {plan.icon} {plan.label}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-gray-500">
-                                    <span>{timeAgo(user.createdAt)}</span>
-                                    <span>🏢 {user.orgCount} | 📄 {user.profileCount}</span>
+                                <div className="mt-3 pt-3 border-t border-gray-50 flex flex-col gap-2">
+                                    <div className="flex items-center justify-between text-xs text-gray-500">
+                                        <span>{timeAgo(user.createdAt)}</span>
+                                        <div className="flex gap-2">
+                                            <span>🏢 {user.orgCount}</span>
+                                            <span>📄 {user.profileCount}</span>
+                                        </div>
+                                    </div>
+                                    {user.profiles && user.profiles.length > 0 && (
+                                        <div className="space-y-1.5 mt-1">
+                                            {user.profiles.map(p => (
+                                                <a 
+                                                    key={p.id}
+                                                    href={`/${p.orgSlug}/${p.slug}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs text-brand-blue hover:underline flex items-center gap-1.5 bg-blue-50/50 p-2 rounded-lg"
+                                                >
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                    <span className="truncate">{p.fullName || p.slug}</span>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );

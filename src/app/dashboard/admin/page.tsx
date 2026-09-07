@@ -33,12 +33,22 @@ export default async function AdminPage() {
     // Get profile counts per user
     const usersWithProfiles = await Promise.all(
         users.map(async (user) => {
-            const profileCount = await prisma.profile.count({
+            const profiles = await prisma.profile.findMany({
                 where: {
                     organization: {
                         userId: user.id,
                     },
                 },
+                select: {
+                    id: true,
+                    slug: true,
+                    fullName: true,
+                    organization: {
+                        select: {
+                            slug: true
+                        }
+                    }
+                }
             });
             return {
                 id: user.id,
@@ -48,7 +58,13 @@ export default async function AdminPage() {
                 plan: user.plan,
                 createdAt: user.createdAt.toISOString(),
                 orgCount: user._count.organizations,
-                profileCount,
+                profileCount: profiles.length,
+                profiles: profiles.map(p => ({
+                    id: p.id,
+                    slug: p.slug,
+                    fullName: p.fullName,
+                    orgSlug: p.organization.slug
+                })),
             };
         })
     );
